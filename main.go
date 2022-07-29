@@ -23,9 +23,9 @@ type WordlePlayer struct {
     colors []string
 }
 
-func contains(slice []string, item string) bool {
-    for _, s := range slice {
-        if s == item {
+func contains(str string, item string) bool {
+    for _, s := range str {
+        if string(s) == item {
             return true
         }
     }
@@ -46,10 +46,10 @@ func arr_compare(arr1 []string, arr2 []string) bool {
     return true
 }
 
-func num_chars(char string, word []string) int {
+func num_chars(char string, word string) int {
     num := 0
     for _, e := range word {
-        if e == char {
+        if string(e) == char {
             num++
         }
     }
@@ -60,11 +60,11 @@ func num_chars(char string, word []string) int {
 // count the number of green and yellow letters that
 // are already filled in in the color_list
 // these letters must correspond to the right char
-func num_detracting_chars(char string, guess []string, color_list []string) int {
+func num_detracting_chars(char string, guess string, color_list []string) int {
     detracting_chars := 0
 
     for i, guess_letter := range guess {
-        if guess_letter == char && (color_list[i] == "g" || color_list[i] == "y")  {
+        if string(guess_letter) == char && (color_list[i] == "g" || color_list[i] == "y")  {
             detracting_chars++
         }
     }
@@ -72,29 +72,29 @@ func num_detracting_chars(char string, guess []string, color_list []string) int 
     return detracting_chars
 }
 
-func gen_colors(guess *string, correct_word *string) string {
+func gen_colors(guess string, correct_word string) string {
     colors := []string{"", "", "", "", ""}
-    correct_word_arr := strings.Split(*correct_word, "")
-    guess_arr := strings.Split(*guess, "")
+    //correct_word_arr := strings.Split(correct_word, "")
+    //guess_arr := strings.Split(guess, "")
     
     // initial round to get greens and blacks
-    for i, char := range *guess {
-        if string(char) == correct_word_arr[i] {
+    for i, char := range guess {
+        if byte(char) == correct_word[i] {
             colors[i] = "g"
         }
-        if !contains(correct_word_arr, string(char)) {
+        if !contains(correct_word, string(char)) {
             colors[i] = "b"
         }
     }
 
     // second round to get yellows
-    for i, char := range *guess {
-        if string(char) == correct_word_arr[i] || !contains(correct_word_arr, string(char)) {
+    for i, char := range guess {
+        if byte(char) == correct_word[i] || !contains(correct_word, string(char)) {
             continue
         }
 
-        total_chars := num_chars(string(char), correct_word_arr)
-        detracting_chars := num_detracting_chars(string(char), guess_arr, colors)
+        total_chars := num_chars(string(char), correct_word)
+        detracting_chars := num_detracting_chars(string(char), guess, colors)
 
         if total_chars - detracting_chars > 0 {
             colors[i] = "y"
@@ -112,7 +112,7 @@ func get_words_remaining(wp *WordlePlayer, ga *Game) []string {
     for _, word := range ga.answer_list {
         valid_flag := true
         for i, guess := range wp.guesses {
-            color_str := gen_colors(&guess, &word)
+            color_str := gen_colors(guess, word)
 
             if color_str != wp.colors[i] {
                 valid_flag = false
