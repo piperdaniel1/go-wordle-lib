@@ -74,6 +74,7 @@ func num_detracting_chars(char string, guess string, color_list []string) int {
 
 func gen_colors(guess string, correct_word string) string {
     colors := []string{"", "", "", "", ""}
+    cache := map[rune]int{}
     //correct_word_arr := strings.Split(correct_word, "")
     //guess_arr := strings.Split(guess, "")
     
@@ -81,6 +82,12 @@ func gen_colors(guess string, correct_word string) string {
     for i, char := range guess {
         if byte(char) == correct_word[i] {
             colors[i] = "g"
+
+            if _, exists := cache[char]; exists {
+                cache[char]++
+            } else {
+                cache[char] = 0
+            }
         }
         if !contains(correct_word, string(char)) {
             colors[i] = "b"
@@ -94,10 +101,21 @@ func gen_colors(guess string, correct_word string) string {
         }
 
         total_chars := num_chars(string(char), correct_word)
-        detracting_chars := num_detracting_chars(string(char), guess, colors)
+        var detracting_chars int
+        if _, exists := cache[char]; exists {
+            detracting_chars = cache[char]
+        } else {
+            detracting_chars = 0
+        }
 
         if total_chars - detracting_chars > 0 {
             colors[i] = "y"
+
+            if _, exists := cache[char]; exists {
+                cache[char]++
+            } else {
+                cache[char] = 0
+            }
         } else {
             colors[i] = "b"
         }
